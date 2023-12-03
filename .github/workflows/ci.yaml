@@ -1,4 +1,4 @@
-name: Internal Documentation CI
+name: CI
 
 on:
   workflow_call: {}

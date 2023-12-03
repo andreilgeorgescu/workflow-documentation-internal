@@ -1,0 +1,13 @@
+name: Development
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  development:
+    uses: andreilgeorgescu/reusable-workflows/.github/workflows/prebuild-devcontainer-image.yaml@main
+    permissions:
+      contents: read
+      packages: write
