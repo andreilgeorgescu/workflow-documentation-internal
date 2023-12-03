@@ -7,7 +7,7 @@ on:
 
 jobs:
   ci:
-    uses: andreilgeorgescu/ci-devcontainter-image/main/.github/workflows/ci.yaml@main
+    uses: andreilgeorgescu/ci-devcontainter-image/.github/workflows/ci.yaml@main
     permissions:
       contents: read
       packages: write
