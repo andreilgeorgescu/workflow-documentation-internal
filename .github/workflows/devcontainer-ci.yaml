@@ -1,15 +1,9 @@
 name: Dev Container CI
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
-    # tags:
-    #   - "v*.*.*"
-    # pull_requests:
-    #   branches:
-    #     - "master"
+    tags:
+      - "v*.*.*"
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -23,9 +17,21 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Retrieve source code
         uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -39,5 +45,6 @@ jobs:
         with:
           subFolder: .github
           imageName: ${{ env.IMAGE_NAME }}
-          cacheFrom: ${{ env.IMAGE_NAME }}
+          imageTag: ${{ steps.meta.outputs.tags }}
+          cacheFrom: ${{ env.IMAGE_NAME }}:latest
           push: always
