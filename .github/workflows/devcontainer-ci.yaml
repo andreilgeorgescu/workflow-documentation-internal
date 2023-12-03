@@ -13,11 +13,10 @@ env:
   USER_NAME: ${{ github.actor }}
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
 
     steps:
       - name: Retrieve source code
@@ -27,11 +26,32 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
           sep-tags: ","
+
+      - name: Build dev container image
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: .github
+          imageName: ${{ env.IMAGE_NAME }}
+          imageTag: ${{ steps.meta.outputs.tags }}
+          cacheFrom: ${{ env.IMAGE_NAME }}:latest
+          # No push here, as we'll handle it in a separate step
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Retrieve source code
+        uses: actions/checkout@v4
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -40,11 +60,10 @@ jobs:
           username: ${{ env.USER_NAME }}
           password: ${{ env.PASSWORD }}
 
-      - name: Pre-build dev container image
-        uses: devcontainers/ci@v0.3
-        with:
-          subFolder: .github
-          imageName: ${{ env.IMAGE_NAME }}
-          imageTag: ${{ steps.meta.outputs.tags }}
-          cacheFrom: ${{ env.IMAGE_NAME }}:latest
-          push: always
+      - name: Push Docker Image to Registry
+        run: |
+          tags="${{ steps.meta.outputs.tags }}"
+          for tag in ${tags//,/ }
+          do
+            docker push ${{ env.IMAGE_NAME }}:$tag
+          done
