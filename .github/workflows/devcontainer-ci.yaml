@@ -34,7 +34,7 @@ jobs:
           sep-tags: ","
 
       - name: Print generated tags
-        run: "echo 'Generated tags: ${{ steps.meta.outputs.tags }}'"
+        run: "echo 'Generated tags: ${{ steps.meta.outputs.version }}'"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -48,6 +48,6 @@ jobs:
         with:
           subFolder: .github
           imageName: ${{ env.IMAGE_NAME }}
-          imageTag: ${{ steps.meta.outputs.tags }}
+          imageTag: ${{ steps.meta.outputs.version }}
           cacheFrom: ${{ env.IMAGE_NAME }}:latest
           push: always
