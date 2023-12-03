@@ -17,5 +17,5 @@
             ]
         }
     },
-    "updateContentCommand": "trunk install && pip install 'mkdocs-material=9.0' && pip install mkdocs-enumerate-headings-plugin"
+    "updateContentCommand": "trunk install && pip install 'mkdocs-material=9.0.0' && pip install mkdocs-enumerate-headings-plugin"
 }
