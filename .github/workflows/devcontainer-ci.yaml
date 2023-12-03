@@ -7,10 +7,10 @@ on:
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
+  REPOSITORY_NAME: ${{ github.repository }}
   PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   REGISTRY: ghcr.io
   USER_NAME: ${{ github.actor }}
-  MODIFIED_TAGS: "" # Initialize an environment variable for the modified tags
 
 jobs:
   build-and-push:
@@ -27,15 +27,15 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.REPOSITORY_NAME }}
           tags: |
             type=semver,pattern={{major}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{version}}
           sep-tags: ","
 
-      - name: Modify and set tags
-        run: echo "MODIFIED_TAGS=$(echo '${{ steps.meta.outputs.tags }}' | sed 's/${{ env.IMAGE_NAME }}://g')" >> $GITHUB_ENV
+      - name: Print generated tags
+        run: "echo 'Generated tags: ${{ steps.meta.outputs.tags }}'"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -49,6 +49,6 @@ jobs:
         with:
           subFolder: .github
           imageName: ${{ env.IMAGE_NAME }}
-          imageTag: ${{ env.MODIFIED_TAGS }}
+          imageTag: ${{ steps.meta.outputs.tags }}
           cacheFrom: ${{ env.IMAGE_NAME }}:latest
           push: always
