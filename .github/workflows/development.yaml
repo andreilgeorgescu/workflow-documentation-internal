@@ -7,7 +7,7 @@ on:
 
 jobs:
   development:
-    uses: andreilgeorgescu/reusable-workflows/.github/workflows/prebuild-devcontainer-image.yaml@main
+    uses: andreilgeorgescu/workflow-devcontainer-image/.github/workflows/ci.yaml@main
     permissions:
       contents: read
       packages: write
