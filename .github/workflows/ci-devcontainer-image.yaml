@@ -1,0 +1,13 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  ci:
+    uses: andreilgeorgescu/ci-devcontainter-image/main/.github/workflows/ci.yaml@main
+    permissions:
+      contents: read
+      packages: write
